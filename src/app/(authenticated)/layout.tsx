@@ -1,29 +1,31 @@
 "use client";
-
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Layouts/Navigation";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useAuth } from "@/hooks/auth";
 
-const AppLayout = ({ children }: { children: ReactNode }) => {
+const AuthLayout = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const { user } = useAuth();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isAuthenticated, router]);
 
-  // useEffect(() => {
-  //   if (!isAuthenticated) {
-  //     router.replace("/login");
-  //   }
-  // }, [isAuthenticated, router]);
+  if (!isAuthenticated) {
+    return null; 
+  }
 
-  return isAuthenticated ? (
+  return (
     <div className="min-h-screen bg-gray-100">
       <Navigation user={user} />
       <main>{children}</main>
     </div>
-  ) : router.replace("/login");
+  );
 };
 
-export default AppLayout;
+export default AuthLayout;
