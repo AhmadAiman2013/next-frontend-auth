@@ -4,11 +4,6 @@ import { AxiosResponse } from 'axios'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuthStore } from './useAuthStore'
 
-import Cookies from 'js-cookie'
-
-import useSWR from 'swr'
-
-
 import { LoginUserData } from '@/types/schema/UserSchema'
 
 interface MiddlewareProps {

@@ -34,9 +34,9 @@ const LoginPage = () => {
     validatorAdapter: valibotValidator(),
     onSubmit: async ({ value }) => {
       const response = await login(value);
-      // if (response?.error) {
-      //   setErrors(response.error);
-      // }
+      if (response?.error) {
+        setErrors(response.error);
+      }
     },
   });
 
