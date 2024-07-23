@@ -15,7 +15,7 @@ import { useAuth } from '@/hooks/useAuth'
 const Navigation = ({ user }: { user: UserType }) => {
   const pathname = usePathname()
 
-  const { logout } = useAuth()
+  const { logout } = useAuth({})
   const [open, setOpen] = useState<boolean>(false)
 
   return (

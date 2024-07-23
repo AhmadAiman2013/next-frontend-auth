@@ -2,20 +2,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from '@/lib/axios'
 import { AxiosResponse } from 'axios'
 import { useRouter, useParams } from 'next/navigation'
-import { useAuthStore } from './useAuthStore'
+import { useEffect } from 'react'
 
 import { LoginUserData } from '@/types/schema/UserSchema'
 
 interface MiddlewareProps {
   middleware?: string;
   redirectIfAuthenticated?: string;
+  redirectIfNotAuthenticated?: string;
 }
 
-export const useAuth = () => {
+export const useAuth = ({middleware, redirectIfAuthenticated, redirectIfNotAuthenticated} : MiddlewareProps) => {
   const router = useRouter()
   const params = useParams()
   const queryClient = useQueryClient();
-  const setIsAuthenticated = useAuthStore((state) => state.setIsAuthenticated)
 
  
   const { data: user, error } = useQuery({
@@ -45,7 +45,6 @@ export const useAuth = () => {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
-      setIsAuthenticated(true)
       router.push('/dashboard')
     },
   });
@@ -70,7 +69,6 @@ export const useAuth = () => {
     },
     onSuccess: () => {
       queryClient.clear();
-      setIsAuthenticated(false)
       router.push('/login')
     },
     onError: (error) => {
@@ -122,26 +120,30 @@ export const useAuth = () => {
     }
   }
 
-  
+  useEffect(() => {
+    if (middleware === 'guest' && redirectIfAuthenticated && user) {
+      router.push(redirectIfAuthenticated)
+    }
 
-  // useEffect(() => {
-  //   if (middleware === 'guest' && redirectIfAuthenticated && user) {
-  //     router.push(redirectIfAuthenticated)
-  //   }
+    if (middleware === 'auth' && redirectIfNotAuthenticated && !user) {
+      router.push(redirectIfNotAuthenticated)
+    }
 
-  //   if (
-  //     window.location.pathname === '/verify-email' &&
-  //     user?.email_verified_at &&
-  //     redirectIfAuthenticated
-  //   ) {
-  //     router.push(redirectIfAuthenticated)
-  //   }
-  //   if (middleware === 'auth' && error) logout()
-  // }, [user, error, middleware, redirectIfAuthenticated])
+    if (
+      window.location.pathname === '/verify-email' &&
+      user?.email_verified_at &&
+      redirectIfAuthenticated
+    ) {
+      router.push(redirectIfAuthenticated)
+    }
+    if (middleware === 'auth' && error) logout() //logout
+  }, [user, error, middleware, redirectIfAuthenticated, redirectIfNotAuthenticated])
+
 
   
   return {
     user,
+    error,
     // register,
     login,
     forgotPassword,

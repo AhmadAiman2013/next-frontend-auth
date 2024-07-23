@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function Home() {
-  const { user } = useAuth()
+  const { user } = useAuth({middleware: 'guest'})
 
   return (
     <>

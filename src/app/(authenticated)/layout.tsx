@@ -2,22 +2,14 @@
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Layouts/Navigation";
-import { useAuthStore } from "@/hooks/useAuthStore";
+
 import { useAuth } from "@/hooks/useAuth";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
-  const router = useRouter();
-  const { user } = useAuth();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { user } = useAuth({ middleware: 'auth', redirectIfNotAuthenticated: '/login'});
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace("/login");
-    }
-  }, [isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return <div>Loading..</div>; 
+  if (!user) {
+    return null;
   }
 
   return (

@@ -18,7 +18,10 @@ const LoginPage = () => {
   const [status, setStatus] = useState<string>("");
   const [error, setErrors] = useState<string>("");
 
-  const { login } = useAuth();
+  const { login } = useAuth({
+     middleware: 'guest',
+    redirectIfAuthenticated: '/dashboard'
+  });
 
   useEffect(() => {
     const resetToken = searchParams.get("reset");

@@ -1,6 +1,8 @@
-import React from 'react'
+'use client'
+import { useAuth } from '@/hooks/useAuth'
 
 const DashboardPage = () => {
+  
   return (
     <div className="py-12">
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
