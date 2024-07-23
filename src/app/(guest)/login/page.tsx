@@ -7,7 +7,7 @@ import { valibotValidator } from "@tanstack/valibot-form-adapter";
 import { useForm } from "@tanstack/react-form";
 import { LoginSchema } from "@/types/schema/UserSchema";
 
-import { useAuth } from "@/hooks/auth";
+import { useAuth } from "@/hooks/useAuth";
 import ApplicationLogo from "@/components/ApplicationLogo";
 import AuthCard from "@/components/AuthCard";
 import { useEffect, useState } from "react";

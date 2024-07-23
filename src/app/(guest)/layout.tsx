@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/hooks/useAuthStore";
 
 const GuestLayout = ({ children }: { children: ReactNode }) => {
+
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -11,10 +12,10 @@ const GuestLayout = ({ children }: { children: ReactNode }) => {
     if (isAuthenticated) {
       router.replace("/dashboard");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated]);
 
   if (isAuthenticated) {
-    return null
+    return <div>Loading...</div>
   }
 
   return <>{children}</>;

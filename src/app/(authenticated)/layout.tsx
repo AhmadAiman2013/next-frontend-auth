@@ -3,7 +3,7 @@ import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Layouts/Navigation";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useAuth } from "@/hooks/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
@@ -14,10 +14,10 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
     if (!isAuthenticated) {
       router.replace("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
-    return null; 
+    return <div>Loading..</div>; 
   }
 
   return (
