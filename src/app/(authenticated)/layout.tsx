@@ -1,23 +1,22 @@
-"use client";
-import { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Navigation from "@/components/Layouts/Navigation";
+'use client'
+import { ReactNode } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import Navigation from '@/components/Layouts/Navigation'
 
-import { useAuth } from "@/hooks/useAuth";
-
-const AuthLayout = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth({ middleware: 'auth', redirectIfNotAuthenticated: '/login'});
+const AppLayout = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuth({ middleware: 'auth', redirectIfNotAuthenticated: '/login' })
 
   if (!user) {
-    return null;
+    return null
   }
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation user={user} />
+      {/* Page Content */}
       <main>{children}</main>
     </div>
-  );
-};
+  )
+}
 
-export default AuthLayout;
+export default AppLayout

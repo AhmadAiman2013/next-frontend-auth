@@ -4,7 +4,7 @@ import { AxiosResponse } from 'axios'
 import { useRouter, useParams } from 'next/navigation'
 import { useEffect } from 'react'
 
-import { LoginUserData } from '@/types/schema/UserSchema'
+import { ForgotPasswordData, LoginUserData, RegisterUserData, ResetPasswordData } from '@/types/schema/UserSchema'
 
 interface MiddlewareProps {
   middleware?: string;
@@ -37,7 +37,7 @@ export const useAuth = ({middleware, redirectIfAuthenticated, redirectIfNotAuthe
 
   const csrf = () => axios.get('/sanctum/csrf-cookie')
 
-  // //  // login mutation
+  // login mutation
    const loginMutation = useMutation({
     mutationFn: async (data: LoginUserData) => {
       await csrf();
@@ -61,8 +61,40 @@ export const useAuth = ({middleware, redirectIfAuthenticated, redirectIfNotAuthe
     }
   };
 
+  //login google
+  const loginGoogle = async () => { 
+    try {
+      window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/redirect`;
+    } catch (error: any) {
+      console.error("Login failed");
+    }
+  }
+
+  // register mutation
+  const registerMutation = useMutation({
+    mutationFn: async (data: RegisterUserData) => {
+      await csrf();
+      await axios.post("/register", data);
+    },
+    onSuccess: () => {
+      router.push('/verify-email')
+    }
+  });
+
+  // register
+  const register = async (data: RegisterUserData) => {
+    try {
+      await registerMutation.mutateAsync(data);
+    } catch (error: any) {
+      console.error("register failed");
+      return {
+        error: error.response?.data?.message || "An unexpected error occurred",
+      };
+    }
+  };
+
  
-  //  // logout mutation
+  // logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await axios.post('/logout')
@@ -82,22 +114,16 @@ export const useAuth = ({middleware, redirectIfAuthenticated, redirectIfNotAuthe
   };
 
 
-  const forgotPassword = async (data: {
-    email: string
-  }): Promise<AxiosResponse> => {
+  const forgotPassword = async (data: ForgotPasswordData ): Promise<AxiosResponse> => {
     try {
       await csrf()
       return await axios.post('/forgot-password', data)
-    } catch (error) {
-      throw error
+    } catch (error: any) {
+      throw Error
     }
   }
 
-  const resetPassword = async (data: {
-    email: string
-    password: string
-    password_confirmation: string
-  }) => {
+  const resetPassword = async (data: ResetPasswordData) => {
     try {
       await csrf()
 
@@ -105,10 +131,12 @@ export const useAuth = ({middleware, redirectIfAuthenticated, redirectIfNotAuthe
         ...data,
         token: params.token,
       })
-
       router.push('/login?reset=' + btoa(response.data.status))
-    } catch (error) {
-      throw error
+    } catch (error: any) {
+      console.error("Reset password failed");
+      return {
+        error: error.response?.data?.message || "An unexpected error occurred",
+      };
     }
   }
 
@@ -121,31 +149,32 @@ export const useAuth = ({middleware, redirectIfAuthenticated, redirectIfNotAuthe
   }
 
   useEffect(() => {
-    if (middleware === 'guest' && redirectIfAuthenticated && user) {
-      router.push(redirectIfAuthenticated)
+    if (middleware === 'guest') {
+      if (redirectIfAuthenticated && user) {
+        router.push(redirectIfAuthenticated)
+      }
+    } 
+    else if (middleware === 'auth') {
+      if (redirectIfNotAuthenticated && !user) {
+        router.push(redirectIfNotAuthenticated)
+      } 
+      if (user?.email_verified_at && redirectIfAuthenticated) {
+        router.push(redirectIfAuthenticated)
+      }
+      if (error) {
+        logout()
+      }
     }
-
-    if (middleware === 'auth' && redirectIfNotAuthenticated && !user) {
-      router.push(redirectIfNotAuthenticated)
-    }
-
-    if (
-      window.location.pathname === '/verify-email' &&
-      user?.email_verified_at &&
-      redirectIfAuthenticated
-    ) {
-      router.push(redirectIfAuthenticated)
-    }
-    if (middleware === 'auth' && error) logout() //logout
-  }, [user, error, middleware, redirectIfAuthenticated, redirectIfNotAuthenticated])
+  }, [user, error, middleware, redirectIfAuthenticated, redirectIfNotAuthenticated,])
 
 
   
   return {
     user,
     error,
-    // register,
+    register,
     login,
+    loginGoogle,
     forgotPassword,
     resetPassword,
     resendEmailVerification,
